@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
-
+from time import time
 from loss.triplet import TripletLoss, TripletSemihardLoss
 
 class Loss(nn.modules.loss._Loss):
@@ -46,8 +46,6 @@ class Loss(nn.modules.loss._Loss):
 
         self.device = torch.device('cpu' if args.cpu else 'cuda')
         self.loss_module.to(self.device)
-        
-        if args.load != '': self.load(ckpt.dir, cpu=args.cpu)
         if not args.cpu and args.nGPU > 1:
             self.loss_module = nn.DataParallel(
                 self.loss_module, range(args.nGPU)
@@ -57,12 +55,14 @@ class Loss(nn.modules.loss._Loss):
         losses = []
         for i, l in enumerate(self.loss):
             if l['type'] == 'Triplet':
-                loss = [l['function'](output, labels) for output in outputs[1:-1]]
-                loss = sum(loss) / len(loss)
+                loss = l['function'](outputs[0], labels)
+                #loss = [l['function'](output, labels) for output in outputs[1:-1]]
+                #loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
             elif l['type'] == 'CrossEntropy':
+                #loss = l['function'](outputs[1], labels)
                 loss = [l['function'](output, labels) for output in outputs[-1]]
                 loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss

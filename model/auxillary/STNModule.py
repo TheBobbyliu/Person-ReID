@@ -5,9 +5,6 @@ import torch
 import torch.nn as nn 
 import torch.nn.functional as F 
 
-
-
-
 class SpatialTransformer(nn.Module):
     """
     Implements a spatial transformer 
@@ -71,8 +68,3 @@ class SpatialTransformer(nn.Module):
         rois = self.relu(rois)
         return rois, affine_grid_points
         
-
-        
-
-        
-

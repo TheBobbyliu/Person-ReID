@@ -21,6 +21,7 @@ class MGN(nn.Module):
         mobilenet = MobileNetV2(1000)
         state_dict = torch.load('./model/mobilenet_v2.pth.tar')
         mobilenet.load_state_dict(state_dict)
+        self.base_params = mobilenet.parameters()
 
         self.backone = mobilenet.features[:8]
         # 384, 128 --> 24, 8

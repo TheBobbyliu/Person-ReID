@@ -1,0 +1,75 @@
+# basic settings
+worker : 8
+cpu : False
+nGPU : 2
+
+# load&&save
+load: ./log/resnet/checkpoint_best.pt
+save: ./log/resmid
+restart:True
+
+# model
+model: Resnetmid
+
+# data settings
+datadir : ../market1501
+height : 256
+width : 128
+num_classes : 751
+
+# network hyperparameters
+lr : 0.0002
+batchsize : 64
+epochs : 250
+test :False
+test_every : 50
+batchtest : 32
+freeze: 10
+
+# for reid 
+batchid : 32
+
+# loss
+loss : 1*CrossEntropy+2*Triplet
+margin : 1.2
+
+# optimizer settings
+optimizer : ADAM
+
+# ADAM&&NADAM parameters
+beta1 : 0.9
+beta2 : 0.999
+amsgrad : True
+# SGD parameters (RMSProp only needs momentum)
+momentum : 0.9
+dampening : 0
+nesterov : True
+
+#universal
+epsilon : 0.00000001
+weight_decay : 0.0005
+lr_decay : 100
+
+# scheduler settings
+stepsize : [120, 180]
+gamma : 0.1
+
+# optimizer, loss, model are integrated in one save file, 
+# but for saparate save files there should be a solution(see the code below)
+load_optimizer: #./log/AMG/optimizer.pt
+load_loss: #./log/AMG/loss.pt
+load_loss_log: #./log/AMG/loss_log.pt
+load_map_log: #./log/AMG/map_log.pt
+
+# for PCB RPP
+module : MGN
+feats : 256
+slice_p2 : 3
+slice_p3 : 4
+
+# other settings
+# rollback : True
+random_erasing : True
+probability : 0.5
+re_rank: False
+gradient_check: 0

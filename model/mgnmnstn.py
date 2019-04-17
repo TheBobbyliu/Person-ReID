@@ -5,12 +5,14 @@ from torch import nn
 import torch.nn.functional as F
 
 from torchvision.models.resnet import resnet50, Bottleneck
-from model.MobileNetV2 import MobileNetV2, InvertedResidual
-from model.STNModule import SpatialTransformer
+from model.auxillary.MobileNetV2 import MobileNetV2, InvertedResidual
+from model.auxillary.STNModule import SpatialTransformer
 
 import math
 from copy import deepcopy
-
+from setproctitle import setproctitle
+from utils.utility import load_state_dict
+setproctitle("MobileNet+SpatialTransform")
 
 def make_model(args):
     return MGN(args)
@@ -23,6 +25,7 @@ class MGN(nn.Module):
         mobilenet = MobileNetV2(1000)
         state_dict = torch.load('./model/mobilenet_v2.pth.tar')
         mobilenet.load_state_dict(state_dict)
+        self.base_params = mobilenet.parameters()
 
         self.STN = SpatialTransformer(3, (args.height, args.width), 3)
 

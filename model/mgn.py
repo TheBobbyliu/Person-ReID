@@ -15,6 +15,7 @@ class MGN(nn.Module):
         num_classes = args.num_classes
 
         resnet = resnet50(pretrained=True)
+        self.base_params = resnet.parameters()
         
         self.backone = nn.Sequential(
             resnet.conv1,

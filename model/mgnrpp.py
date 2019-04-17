@@ -6,9 +6,12 @@ import torch.nn.functional as F
 from torch.nn import init
 
 from torchvision.models.resnet import resnet50, Bottleneck
-from model.MobileNetV2 import MobileNetV2, InvertedResidual
+from model.auxillary.MobileNetV2 import MobileNetV2, InvertedResidual
 import math
 from copy import deepcopy
+from setproctitle import setproctitle
+from utils.utility import load_state_dict
+setproctitle("MobileNet+RPP")
 
 def make_model(args):
     return MGN(args)
@@ -67,7 +70,7 @@ class MGN(nn.Module):
             self.reduction_module.append(copy.deepcopy(reduction))
 
         for i in range(self.args.slice_p2+self.args.slice_p3+3):
-            fc = nn.Linear(args.feats, num_classes)
+            fc = nn.Conv2d(args.feats, num_classes, 1, bias=True)
             self._init_fc(fc)
             self.fc_module.append(fc)
 
@@ -83,7 +86,7 @@ class MGN(nn.Module):
 
     @staticmethod
     def _init_fc(fc):
-        nn.init.kaiming_normal_(fc.weight, mode='fan_out')
+        nn.init.kaiming_normal_(fc.weight, mode='fan_in')
         #nn.init.normal_(fc.weight, std=0.001)
         nn.init.constant_(fc.bias, 0.)
 
@@ -117,18 +120,22 @@ class MGN(nn.Module):
         # reduce dimensions to args.feats
         feats = []
         for i in range(len(middle)):
-            fg = self.reduction_module[i](middle[i]).squeeze(dim=3).squeeze(dim=2)
+            fg = self.reduction_module[i](middle[i])
             feats.append(fg)
 
         # fully connected to dimension 'feats' so as to get softmax
         featsclass = []
         for i in range(len(feats)):
             l = self.fc_module[i](feats[i])
-            featsclass.append(l)
+            featsclass.append(l.squeeze(dim=3).squeeze(dim=2))
 
-        predict = torch.cat(feats, dim=1)
+        predict = torch.cat(feats, dim=1).squeeze(dim=3).squeeze(dim=2)
         
-        return predict, feats[0], feats[1], feats[2], featsclass
+        return predict, \
+               feats[0].squeeze(dim=3).squeeze(dim=2),\
+               feats[1].squeeze(dim=3).squeeze(dim=2),\
+               feats[2].squeeze(dim=3).squeeze(dim=2),\
+               featsclass
 
         
 class RPP(nn.Module):

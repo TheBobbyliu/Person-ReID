@@ -1,0 +1,47 @@
+parser = argparse.ArgumentParser(description='Pytorch model')
+
+# basic settings
+parser.add_argument('--worker', type=int, default=4, help='number of workers in dataloader')
+parser.add_argument('--cpu', action='store_true', help='use cpu only')
+parser.add_argument('--nGPU', type=int, default=1, help='number of gpus')
+
+# data settings
+parser.add_argument('--datadir', type=str, help='data directory')
+parser.add_argument('--height', type=int, default=384)
+parser.add_argument('--width', type=int, default=128)
+parser.add_argument('--num_classes', type=int, default=751, help='number of classes')
+
+# network hyperparameters
+parser.add_argument('--lr', type=float, default=0.1, help='learning rate')
+parser.add_argument('--batchsize', type=int, default=16, help='batch size')
+parser.add_argument('--epochs', type=int, default=50)
+parser.add_argument('--test', action='store_true', help='test only')
+parser.add_argument('--test_every', type=int, default = 25, help='test every n epochs')
+parser.add_argument('--batchtest', type=int, default=16, help='batchsize for testing')
+
+# for re-id
+parser.add_argument('--batchid', type=int, default=8, help='ids in every batch')
+
+# loss
+parser.add_argument('--loss', type=str, default='1*CrossEntropy', help='weight1*loss1 + weight2*loss2')
+parser.add_argument('--margin', type=float, default=1.2, help='margin in Triplet Loss')
+
+# optimizer&&loss settings
+parser.add_argument('--optimizer', type=str, default='adam', help='type of optimizer')
+parser.add_argument('--stepsize', type=int, default=100, nargs='+', help='by every stepsize epochs, lr is multiplied by gamma')
+parser.add_argument('--gamma', type=float, default=0.1, help='learning rate decay')
+
+# save && load
+parser.add_argument('--load', type=str, default=None, help='model and optimizer and log')
+parser.add_argument('--save', type=str, default=None)
+
+# model
+parser.add_argument('--model', type=str, default='mgn', help='choose model')
+parser.add_argument('--module', type=str, default='MGN', help='for switching mode in PCB+RPP only')
+parser.add_argument('--feats', type=int, default=256, help='model output feature size')
+parser.add_argument('--slice_p2', type=int, default=3, help='slice of the second feature')
+parser.add_argument('--slice_p3', type=int, default=4, help='slice of the third feature')
+
+# other setttings 
+parser.add_argument('--rollback', action='store_true', help='reset the fully connected layer')
+parser.add_argument('--random_erasing', action='store_true')

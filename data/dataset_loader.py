@@ -1,15 +1,6 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import division
-
-import os
 from PIL import Image
-import numpy as np
-import os.path as osp
-import io
-
-import torch
 from torch.utils.data import Dataset
+import os.path as osp
 
 def read_image(img_path):
     """Keep reading image until succeed.
@@ -49,3 +40,6 @@ class ImageDataset(Dataset):
     @property
     def unique_ids(self):
         return sorted(set(self.ids))
+
+    @property
+    def 

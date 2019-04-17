@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.nn import init
 
 from torchvision.models.resnet import resnet50, Bottleneck
-from model.MobileNetV2 import MobileNetV2, InvertedResidual
+from model.auxillary.MobileNetV2 import MobileNetV2, InvertedResidual
 import math
 from copy import deepcopy
 
@@ -21,6 +21,7 @@ class MGN(nn.Module):
         mobilenet = MobileNetV2(1000)
         state_dict = torch.load('./model/mobilenet_v2.pth.tar')
         mobilenet.load_state_dict(state_dict)
+        self.base_params = mobilenet.parameters()
 
         self.backone = mobilenet.features[:8]
         # 384, 128 --> 24, 8
