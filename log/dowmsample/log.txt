@@ -1,3 +1,0 @@
-
-[INFO] Test:
-[INFO] mAP: 0.8421 rank1: 0.9365 rank3: 0.9688 rank5: 0.9771 rank10: 0.9857 (Best: 0.8421 @epoch 400)
