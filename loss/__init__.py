@@ -10,7 +10,6 @@ import torch
 import torch.nn as nn
 from time import time
 from loss.triplet import TripletLoss, TripletSemihardLoss
-from loss.corrloss import CorrLoss
 
 class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckpt):
@@ -57,55 +56,21 @@ class Loss(nn.modules.loss._Loss):
         losses = []
         for i, l in enumerate(self.loss):
             if l['type'] == 'Triplet':
-                loss = l['function'](outputs[0], labels)
-                #loss = [l['function'](output, labels) for output in outputs[1:-1]]
-                #loss = sum(loss) / len(loss)
+                # For ResNet
+                #loss = l['function'](outputs[0], labels)
+                # For MGN/RPP
+                loss = [l['function'](output, labels) for output in outputs[1:-1]]
+                loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
             elif l['type'] == 'CrossEntropy':
-                loss = l['function'](outputs[1], labels)
-                #loss = [l['function'](output, labels) for output in outputs[-1]]
-                #loss = sum(loss) / len(loss)
+                # For ResNet
+                #loss = l['function'](outputs[1], labels)
+                # For MGN/RPP
+                loss = [l['function'](output, labels) for output in outputs[-1]]
+                loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss
-                losses.append(effective_loss)
-                self.log[-1, i] += effective_loss.item()
-            elif l['type'] == 'RPP': 
-                output_p2 = outputs[-2]
-                output_p3 = outputs[-1]
-                size_p2 = output_p2.size()
-                size_p3 = output_p3.size()
-                # flatten to be (batch_size, logits_dim, length)
-                output_p2 = output_p2.view(size_p2[0], size_p2[1], -1)
-                output_p3 = output_p3.view(size_p3[0], size_p3[1], -1)
-
-                target_p2 = torch.zeros((size_p2[0],size_p2[2],size_p2[3])).type(torch.cuda.LongTensor)
-                height_split0 = 0
-                for dim in range(0, size_p2[1]):
-                    # create target
-                    height_split1 = int(size_p2[2]*((dim+1)/size_p2[1]))
-                    target_p2[...,height_split0:height_split1,:] = target_p2.new_full(target_p2[...,dim,height_split0:height_split1,:].size(), dim)
-                    height_split0 = height_split1
-
-                target_p3 = torch.zeros((size_p3[0],size_p3[2],size_p3[3])).type(torch.cuda.LongTensor)
-                height_split0 = 0
-                for dim in range(1, size_p3[1]):
-                    # create target
-                    height_split1 = int(size_p3[2]*((dim+1)/size_p3[1]))
-                    target_p3[...,height_split0:height_split1,:] = target_p3.new_full(target_p3[...,dim,height_split0:height_split1,:].size(), dim)
-                    height_split0 = height_split1
-
-                # flatten to be (batch_size, logits_dim, length)
-                target_p2 = target_p2.view((target_p2.size()[0],-1))
-                target_p3 = target_p3.view((target_p3.size()[0],-1))
-                loss1 = l['function'](output_p2, target_p2)
-                loss2 = l['function'](output_p3, target_p3)
-                effective_loss = ((loss1+loss2)*l['weight'])
-                losses.append(effective_loss)
-                self.log[-1, i] += effective_loss.item()
-            elif l['type'] == 'Corr':
-                loss = l['function'](outputs[0], labels)
-                effective_loss = loss * l['weight']
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
             else:

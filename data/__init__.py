@@ -2,7 +2,7 @@ from torchvision import transforms
 from torch.utils.data import dataloader
 from .datautils.random_erasing import RandomErasing
 from .samplers import RandomSampler
-from .dataset import whale, market1501
+from .dataset import market1501
 
 class Data:
     def __init__(self, args):
