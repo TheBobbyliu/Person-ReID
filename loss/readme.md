@@ -1,4 +1,4 @@
-ÈçºÎ×Ô¼ºĞŞ¸Älossº¯Êı£¿
+å¦‚ä½•è‡ªå·±ä¿®æ”¹losså‡½æ•°ï¼Ÿ
 ```
 Class Loss(nn.modules.loss._Loss):
 Def __init__(self, args, ckpt):
@@ -6,15 +6,17 @@ Def __init__(self, args, ckpt):
 Self.loss_module = nn.ModuleList()
 Self.loss_module.append(nn.CrossEntropyLoss())
 Self.loss_module.append(TripletLoss())
-Self.device = torch.device(¡®cuda¡¯)
+Self.device = torch.device(â€˜cudaâ€™)
 Self.loss_module.to(self.device)
 If args.nGPU >1:
 Self.loss_module = nn.DataParallel(self.loss_module, range(args.nGPU)
 Def forward(self, outputs, labels):
 Return loss
 ```
-ÈçºÎ¼ÇÂ¼lossµÄ±ä»¯ÄØ£¿
-´´½¨Ò»¸ö```log = torch.Tensor()```,ÔÚÃ¿Ò»ÂÖ¶¼½øĞĞ¼ÇÂ¼£¬concatÉÏÈ¥Ò»¸öÖµ
+å¦‚ä½•è®°å½•lossçš„å˜åŒ–å‘¢ï¼Ÿ
 
-×Ô¶¨Òålossº¯Êı
-¼Ì³Ğ³éÏóÀà```nn.Module```
+åˆ›å»ºä¸€ä¸ª```log = torch.Tensor()```,åœ¨æ¯ä¸€è½®éƒ½è¿›è¡Œè®°å½•ï¼Œconcatä¸Šå»ä¸€ä¸ªå€¼
+
+è‡ªå®šä¹‰losså‡½æ•°
+
+ç»§æ‰¿æŠ½è±¡ç±»```nn.Module```
