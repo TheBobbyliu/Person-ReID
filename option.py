@@ -28,6 +28,8 @@ class configs():
             elif v[0]=='[':
                 v = v[1:-1].split(',')
                 v = [int(f) for f in v]
+            elif v[0]=='#':
+                v = None
             setattr(self, k, v)
         self.lr = float(self.lr)
         if 'Triplet' in self.loss:

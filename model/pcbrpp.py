@@ -9,14 +9,12 @@ from torchvision.models.resnet import resnet50, Bottleneck
 from model.auxillary.MobileNetV2 import MobileNetV2, InvertedResidual
 import math
 from copy import deepcopy
-from setproctitle import setproctitle
 from utils.utility import load_state_dict
-setproctitle("PCB+RPP")
 
 def make_model(args):
-    return MGN(args)
+    return PCBRPP(args)
 
-class MGN(nn.Module):
+class PCBRPP(nn.Module):
     def __init__(self, args):
         super(MGN, self).__init__()
         num_classes = args.num_classes
@@ -25,6 +23,7 @@ class MGN(nn.Module):
         state_dict = torch.load('./model/mobilenet_v2.pth.tar')
         mobilenet.load_state_dict(state_dict)
         self.base_params = mobilenet.parameters()
+
         self.backone = mobilenet.features[:8]
         # 384, 128 --> 24, 8
         res_conv4 = mobilenet.features[8:14]
@@ -49,12 +48,11 @@ class MGN(nn.Module):
         self.p1 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_g_conv5))
         # 24, 8 --> 24, 8, 1280
         self.p2 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
-        self.p3 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
 
         # only set for RPP
         if args.module == 'RPP':
             self.mod = RPP(self.args)
-        elif args.module == 'MGN':
+        elif args.module == 'PCB':
             self.mod = Normal(self.args)
 
         # for testing, we don't corporate average pooling to the model
@@ -66,10 +64,10 @@ class MGN(nn.Module):
 
         self.fc_module = nn.ModuleList()
 
-        for i in range(self.args.slice_p2+self.args.slice_p3+3):
+        for i in range(args.slices+2):
             self.reduction_module.append(copy.deepcopy(reduction))
 
-        for i in range(self.args.slice_p2+self.args.slice_p3+3):
+        for i in range(args.slices+2):
             fc = nn.Linear(args.feats, num_classes)
             self._init_fc(fc)
             self.fc_module.append(fc)
@@ -98,25 +96,21 @@ class MGN(nn.Module):
         p1 = self.p1(x)
         # 24, 8
         p2 = self.p2(x)
-        p3 = self.p3(x)
-        # TODO:: add RRP to the model
         
         middle = []
 
         # 1, 1
         fg_p1 = self.adaptiveAvgPool(p1)
         fg_p2 = self.adaptiveAvgPool(p2)
-        fg_p3 = self.adaptiveAvgPool(p3)
 
         middle.append(fg_p1)
         middle.append(fg_p2)
-        middle.append(fg_p3)
 
-        slice_results = self.mod(p2, p3)
+        slice_results = self.mod(p2)
         for i in range(len(slice_results)):
             middle.append(self.adaptiveAvgPool(slice_results[i]))
 
-        # middle in form [fg_p1, fg_p2, fg_p3, z0_p2, xxx, z0_p3, xxx]
+        # middle in form [fg_p1, fg_p2, l1_p2, l2_p2, xxx]
         # reduce dimensions to args.feats
         feats = []
         for i in range(len(middle)):
@@ -131,43 +125,32 @@ class MGN(nn.Module):
 
         predict = torch.cat(feats, dim=1)
         
-        return predict, feats[0], feats[1], feats[2], featsclass
+        return predict, feats[0], feats[1], featsclass
 
         
 class RPP(nn.Module):
     def __init__(self, args):
         super(RPP, self).__init__()
         self.args = args
-        self.conv1x1_p2 = nn.Conv2d(1280, args.slice_p2, 1, bias = False)
-        self.conv1x1_p3 = nn.Conv2d(1280, args.slice_p3, 1, bias = False)
+        self.conv1x1_p = nn.Conv2d(1280, 5, 1, bias = False)
         self.softmax = nn.Softmax(dim=1)
         self.norm_block = nn.Sequential(nn.BatchNorm2d(1280), nn.ReLU())
         
         nn.init.normal_(self.norm_block[0].weight, mean=1., std=0.02)
-        init.kaiming_normal_(self.conv1x1_p2.weight.data, mode='fan_out', nonlinearity='relu')
-        init.kaiming_normal_(self.conv1x1_p3.weight.data, mode='fan_out', nonlinearity='relu')
+        init.kaiming_normal_(self.conv1x1_p.weight.data, mode='fan_out', nonlinearity='relu')
     
-    def forward(self, p2, p3):
+    def forward(self, feat):
         # using RRF for deviding
         # calculate softmax along channels
-        logits_p2 = self.conv1x1_p2(p2)
-        logits_p3 = self.conv1x1_p3(p3)
-        prob_p2 = self.softmax(logits_p2)
-        prob_p3 = self.softmax(logits_p3)
+        logits_p = self.conv1x1_p(feat)
+        prob_p = self.softmax(logits_p)
 
         slice_results = []
-        for i in range(self.args.slice_p2):
-            p_i = prob_p2[:, i, :, :].view(p2.size()[0], 1, p2.size()[2],p2.size()[3])
-            y_i = p2 * p_i
+        for i in range(4):
+            p_i = prob_p[:, i, :, :].view(feat.size()[0], 1, feat.size()[2],feat.size()[3])
+            y_i = feat * p_i
             y_i = self.norm_block(y_i)
             slice_results.append(y_i)
-            
-        for i in range(self.args.slice_p3):
-            p_i = prob_p3[:, i, :, :].view(p3.size()[0], 1, p3.size()[2],p3.size()[3])
-            y_i = p3 * p_i
-            y_i = self.norm_block(y_i)
-            slice_results.append(y_i)
-        
         return slice_results
 
 class Normal(nn.Module):
@@ -175,15 +158,12 @@ class Normal(nn.Module):
         super(Normal, self).__init__()
         self.args = args
 
-    def forward(self, p2, p3):
+    def forward(self, p2):
         slice_results = []
         
-        p2_height = p2.size(2)//self.args.slice_p2
-        p3_height = p3.size(2)//self.args.slice_p3
+        height = p2.size(2) // self.args.slices
 
-        for i in range(self.args.slice_p2):
-            slice_results.append(p2[:,:,i*p2_height:(i+1)*p2_height,:])
-        for i in range(self.args.slice_p3):
-            slice_results.append(p3[:,:,i*p3_height:(i+1)*p3_height,:])
+        for i in range(self.args.slices):
+            slice_results.append(p2[:,:,i*height:(i+1)*height,:])
 
         return slice_results

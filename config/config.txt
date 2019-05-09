@@ -4,12 +4,12 @@ cpu : False
 nGPU : 2
 
 # load&&save
-load: ./log/AMG_end/checkpoint_best.pt
-save: ./log/AMG_end
+load: None
+save: ./log/mgnrpp
 restart:True
 
 # model
-model: AMG_end
+model: mgnrpp
 
 # data settings
 datadir : ../market1501
@@ -19,15 +19,15 @@ num_classes : 751
 
 # network hyperparameters
 lr : 0.0002
-batchsize : 16
-epochs : 250
-test :True
-test_every : 50
-batchtest : 16
+batchsize : 64
+epochs : 400
+test : False
+test_every : 80
+batchtest : 1
 freeze: 10
 
 # for reid 
-batchid : 8
+batchid : 32
 
 # loss
 loss : 1*CrossEntropy+2*Triplet
@@ -56,16 +56,17 @@ gamma : 0.5
 
 # optimizer, loss, model are integrated in one save file, 
 # but for saparate save files there should be a solution(see the code below)
-load_optimizer: #./log/AMG/optimizer.pt
-load_loss: #./log/AMG/loss.pt
-load_loss_log: #./log/AMG/loss_log.pt
-load_map_log: #./log/AMG/map_log.pt
+load_optimizer: None
+load_loss: None
+load_loss_log: None
+load_map_log: None
 
-# for PCB RPP
-module : MGN
+# for PCB/MGN RPP
+module : RPP
 feats : 256
 slice_p2 : 3
 slice_p3 : 4
+slices : 6
 
 # other settings
 # rollback : True

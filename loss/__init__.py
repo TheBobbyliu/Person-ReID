@@ -10,6 +10,7 @@ import torch
 import torch.nn as nn
 from time import time
 from loss.triplet import TripletLoss, TripletSemihardLoss
+from loss.corrloss import CorrLoss
 
 class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckpt):
@@ -26,7 +27,8 @@ class Loss(nn.modules.loss._Loss):
                 loss_function = nn.CrossEntropyLoss()
             elif loss_type == 'Triplet':
                 loss_function = TripletLoss(args.margin)
-
+            elif loss_type == 'Corr':
+                loss_function = CorrLoss()
             self.loss.append({
                 'type': loss_type,
                 'weight': float(weight),
@@ -62,9 +64,9 @@ class Loss(nn.modules.loss._Loss):
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
             elif l['type'] == 'CrossEntropy':
-                #loss = l['function'](outputs[1], labels)
-                loss = [l['function'](output, labels) for output in outputs[-1]]
-                loss = sum(loss) / len(loss)
+                loss = l['function'](outputs[1], labels)
+                #loss = [l['function'](output, labels) for output in outputs[-1]]
+                #loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
@@ -99,6 +101,11 @@ class Loss(nn.modules.loss._Loss):
                 loss1 = l['function'](output_p2, target_p2)
                 loss2 = l['function'](output_p3, target_p3)
                 effective_loss = ((loss1+loss2)*l['weight'])
+                losses.append(effective_loss)
+                self.log[-1, i] += effective_loss.item()
+            elif l['type'] == 'Corr':
+                loss = l['function'](outputs[0], labels)
+                effective_loss = loss * l['weight']
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
             else:

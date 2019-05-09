@@ -4,12 +4,12 @@ cpu : False
 nGPU : 1
 
 # load&&save
-load:None 
-save: ./log/resnet
+load: None
+save: ./log/vgg16
 restart:True
 
 # model
-model: Resnet
+model: VGG16
 
 # data settings
 datadir : ../market1501
@@ -19,7 +19,7 @@ num_classes : 751
 
 # network hyperparameters
 lr : 0.0002
-batchsize : 64
+batchsize : 32
 epochs : 250
 test :False
 test_every : 50
@@ -27,7 +27,7 @@ batchtest : 32
 freeze: 10
 
 # for reid 
-batchid : 32
+batchid : 16
 
 # loss
 loss : 1*CrossEntropy+2*Triplet
@@ -61,7 +61,7 @@ load_loss: None
 load_loss_log: None
 load_map_log: None
 
-# for PCB/MGN RPP
+# for PCB/MGN RPP only
 module : MGN
 feats : 256
 slice_p2 : 3

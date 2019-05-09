@@ -1,10 +1,10 @@
 # basic settings
 worker : 8
 cpu : False
-nGPU : 2
+nGPU : 1
 
 # load&&save
-load: ./log/resnet/checkpoint_best.pt
+load: None
 save: ./log/resmid
 restart:True
 
@@ -56,16 +56,17 @@ gamma : 0.1
 
 # optimizer, loss, model are integrated in one save file, 
 # but for saparate save files there should be a solution(see the code below)
-load_optimizer: #./log/AMG/optimizer.pt
-load_loss: #./log/AMG/loss.pt
-load_loss_log: #./log/AMG/loss_log.pt
-load_map_log: #./log/AMG/map_log.pt
+load_optimizer: None
+load_loss: None
+load_loss_log: None
+load_map_log: None
 
-# for PCB RPP
+# for PCB/MGN RPP
 module : MGN
 feats : 256
 slice_p2 : 3
 slice_p3 : 4
+slices : 6
 
 # other settings
 # rollback : True

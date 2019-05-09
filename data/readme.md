@@ -1,8 +1,9 @@
-1.ÈçºÎ×Ô¶¨ÒåsamplerÄØ£¿
-samplerĞèÒªÊä³öµÄÖ»ÓĞÍ¼Æ¬ÎÄ¼şµÄË³Ğò£¬index
-ËùÒÔ¿ÉÒÔ¸ù¾İ×Ô¼ºµÄĞèÇóÀ´Éè¶¨¡£
-ÔÚÕâÀï×îºÃÒÑ¾­·â×°ºÃdata_sourceÊı¾İÔ´
-Ö÷ÒªÉè¶¨Îª£º
+1.å¦‚ä½•è‡ªå®šä¹‰samplerå‘¢ï¼Ÿ
+sampleréœ€è¦è¾“å‡ºçš„åªæœ‰å›¾ç‰‡æ–‡ä»¶çš„é¡ºåºï¼Œindex
+æ‰€ä»¥å¯ä»¥æ ¹æ®è‡ªå·±çš„éœ€æ±‚æ¥è®¾å®šã€‚
+åœ¨è¿™é‡Œæœ€å¥½å·²ç»å°è£…å¥½data_sourceæ•°æ®æº
+ä¸»è¦è®¾å®šä¸ºï¼š
+```
 class Sampler(torch.utils.data.sampler.Sampler):
     def __init__(self, data_source, batch_id, batch_image):
     	super(Sampler, self).__init__(data_source)
@@ -21,25 +22,27 @@ class Sampler(torch.utils.data.sampler.Sampler):
         if len(poopulation) < k:
             population *= k
         return random.sample(population, k)
+```
 
+2. ```from torchvision.datasets.folder import default_loader```
+   å¯ä»¥ç›´æ¥æ‰“å¼€å›¾ç‰‡ä¸ºImageç±»
 
-2. from torchvision.datasets.folder import default_loader
-   ¿ÉÒÔÖ±½Ó´ò¿ªÍ¼Æ¬ÎªImageÀà
-
-3. torch.utils.data.Dataset ÊÇ×¨ÃÅÓÃÀ´¶ÁÈ¡Í¼Æ¬µÄ
-   Ö÷Òªº¯ÊıÒªÓĞ£º
+3. ```torch.utils.data.Dataset``` æ˜¯ä¸“é—¨ç”¨æ¥è¯»å–å›¾ç‰‡çš„
+   å¿…é¡»è¦é‡å†™çš„å‡½æ•°æœ‰ï¼š
+```
    def __init__(self, dataset, transform)
    def __len__(self)
    def __getitem__(self, index)
+```
+4. ```torch.utils.data.dataset.Dataset``` å¯ä»¥ç”¨äºå®šä¹‰è‡ªå·±çš„æ•°æ®é›†ï¼Œä¸è¿‡å…¶å®ä¸éœ€è¦ç»§æ‰¿è¿™ä¸ªç±»ä¹Ÿèƒ½å¤Ÿç”¨ã€‚
+	å¤„ç†è‡ªå·±çš„æ•°æ®é›†å¯ä»¥ä»¥whaleä¸ºæ€è·¯æ¥åšï¼Œåˆ—å‡ºæ‰€æœ‰çš„æ•°æ®ï¼Œå¹¶ä¸”æŠŠtrain, val, testç¼–æˆ[image,label]çš„listæ ¼å¼
 
-4. torch.utils.data.dataset.Dataset ¿ÉÒÔÓÃÓÚ¶¨Òå×Ô¼ºµÄÊı¾İ¼¯£¬²»¹ıÆäÊµ²»ĞèÒª¼Ì³ĞÕâ¸öÀàÒ²ÄÜ¹»ÓÃ¡£
-	´¦Àí×Ô¼ºµÄÊı¾İ¼¯¿ÉÒÔÒÔwhaleÎªË¼Â·À´×ö£¬ÁĞ³öËùÓĞµÄÊı¾İ£¬²¢ÇÒ°Ñtrain, val, test±à³É[image,label]µÄlist¸ñÊ½
-
-5. DataÀà
-    Ö÷ÒªÓÃÓÚÊı¾İµÄ¼¯ºÏ£¬Éú³ÉdataloaderÖ®ºó¾ÍÄÜ¹»Ö±½ÓiterÁË¡£
+5. Dataç±»
+    ä¸»è¦ç”¨äºæ•°æ®çš„é›†åˆï¼Œç”Ÿæˆdataloaderä¹‹åå°±èƒ½å¤Ÿç›´æ¥iteräº†ã€‚
 
 
-¼òµ¥µÄĞ´Ò»¸ö
+ç®€å•çš„å†™ä¸€ä¸ª
+```
 from torch.utils.data import Dataset, dataloader
 class imageDataset(Dataset):
     def __init__(self, dataset, transform):
@@ -72,9 +75,11 @@ class data:
 class RandomIdentitySampler(torch.utils.data.sampler.Sampler):
     def __init__(self, data_source, batch_id, batch_image):
         xxx
-
-6.¼ÓÈëtransform
-transformÀà×î¹Ø¼üµÄº¯ÊıÎª__call__
-Ëü²»ĞèÒª¼Ì³Ğ£¬Ö±½ÓĞ´objectÒ²ĞĞ£¬µ«ÊÇ__call__º¯ÊıÊÇÖ÷ÒªÓÃÓÚÒÔÏÂÇé¿öµÄ
+```
+6.åŠ å…¥transform
+transformç±»æœ€å…³é”®çš„å‡½æ•°ä¸º__call__
+å®ƒä¸éœ€è¦ç»§æ‰¿ï¼Œç›´æ¥å†™objectä¹Ÿè¡Œï¼Œä½†æ˜¯__call__å‡½æ•°æ˜¯ä¸»è¦ç”¨äºä»¥ä¸‹æƒ…å†µçš„
+```
 a = transform()
 b = a(b)
+```

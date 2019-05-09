@@ -27,7 +27,7 @@ class Checkpoint():
         self.state = state
 
         # create save environment
-        if os.path.isdir(self.savedir) is False:
+        if os.path.isdir(self.savedir) is False and args.test == False:
             os.mkdir(self.savedir)
 
         open_type = 'a' if os.path.exists(self.savedir + 'log.txt') else 'w'
@@ -125,7 +125,7 @@ class Checkpoint():
                     print('No loss log loaded')
             else:
                 print('No loss log loaded')
-
+        # model
         self.update_model_state_dict(trainer.model)
 
     def plot_map_rank(self, epoch):

@@ -4,13 +4,12 @@ import loss
 import optimizer
 import data
 import trainer
+import torch
 from utils import checkpoint, check
 from optimizer import optimizer
 
-from setproctitle import setproctitle
-setproctitle('dilation REID')
-
 def main(args):
+    torch.backends.cudnn.benchmark = True
     ckpt_ = checkpoint.Checkpoint(args)
     # data loader
     dataloader_ = data.Data(args)
@@ -30,11 +29,11 @@ def main(args):
     # train with freeze first 
     if args.freeze > 0:
         print('freeze base_params for {} epochs'.format(args.freeze))
-    for par in ckpt_.base_params:
-        par.requires_grad = False
-        if hasattr(model_.get_model(), 'base_params'):
-            for par in model_.get_model().base_params:
-                par.requires_grad = False
+        for par in ckpt_.base_params:
+            par.requires_grad = False
+            if hasattr(model_.get_model(), 'base_params'):
+                for par in model_.get_model().base_params:
+                    par.requires_grad = False
 
     optim_tmp = optimizer.make_optimizer(args, model_)
     for i in range(args.freeze):
