@@ -30,7 +30,8 @@ For training and testing , after setting up ```config.txt```, write:
 
 ---
 
-Test Results of some models on Market-1501 dataset are listed as the following:
+## Test Results 
+of some models on Market-1501 dataset are listed as the following:
 
 |MODEL|mAP|rank-1|rank-3|rank-5|rank-10|
 |------|------|------|------|------|------|
