@@ -1,5 +1,5 @@
 # Person Re-Identification Models 
-written by Pytorch
+written with Pytorch
 
 ### This is a conclusive repository recording my way of learning pytorch.
 #### Hope it is also helpful for you.
@@ -28,7 +28,7 @@ For training and testing , after setting up ```config.txt```, write:
   python3 main.py --cfg config/config.txt
 ```
 
-
+---
 
 Test Results of some models on Market-1501 dataset are listed as the following:
 
