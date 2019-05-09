@@ -68,7 +68,7 @@ dampening : 0
 
 nesterov : True
 
-####universal parameters
+#### universal parameters
 epsilon : 0.00000001
 
 weight_decay : 0.0005
@@ -80,8 +80,8 @@ stepsize : [120, 180]
 
 gamma : 0.1
 
-# optimizer, loss, model are integrated in one save file, 
-# but for saparate save files there should be a solution(see the code below)
+#optimizer, loss, model are integrated in one save file, 
+#but for saparate save files there should be a solution(see the code below)
 load_optimizer: None
 
 load_loss: None
