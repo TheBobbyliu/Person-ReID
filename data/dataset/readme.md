@@ -1,8 +1,13 @@
 Dataset is the son class of torch.utils.data.dataset.Dataset
-ÊÇ×î¿ªÊ¼µÄ²Ù×÷¶ÔÏó£¬Ö÷ÒªÓÃÓÚÊı¾İ¼¯µÄ·ÖÀàÓëÔ¤´¦Àí¡£
 
-Íâ²¿ÌáÈ¡ĞÅÏ¢µÄ·½·¨£º
+æ˜¯æœ€å¼€å§‹çš„æ“ä½œå¯¹è±¡ï¼Œä¸»è¦ç”¨äºæ•°æ®é›†çš„åˆ†ç±»ä¸é¢„å¤„ç†ã€‚
+
+å¤–éƒ¨æå–ä¿¡æ¯çš„æ–¹æ³•ï¼š
+```
 __getitem__(self, index):
     return img, target
-»òÕß
+```
+æˆ–è€…
+```
 dataset = [[path, target], [path,target]]
+```
