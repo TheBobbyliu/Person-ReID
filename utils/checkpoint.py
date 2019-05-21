@@ -17,14 +17,13 @@ class Checkpoint():
         self.base_params = []
         
         # load model&log&optimizer
-        state = None
+        self.state = None
         if args.load != None:
             if not os.path.exists(self.loaddir):
                 print('Loading model with unaccessible path!')
                 return
             else:
-                state = torch.load(self.loaddir)
-        self.state = state
+                self.state = torch.load(self.loaddir)
 
         # create save environment
         if os.path.isdir(self.savedir) is False and args.test == False:

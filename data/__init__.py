@@ -7,9 +7,8 @@ from .dataset import market1501
 class Data:
     def __init__(self, args):
         train_transform_list = [
-            transforms.RandomGrayscale(p=0.3),
-            transforms.ColorJitter(0.05, 0.05, 0.05, 0.05),
             transforms.Resize((args.height, args.width), interpolation=3),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]

@@ -23,31 +23,24 @@ loss : input the losses and their weights
 It might be upsetting that for training, we have to manually edit ```./loss/__init__.py''' (line 58-60, 65-67)
  so as to adjust to different outputs, although this is very easy.
  
-For training and testing , after setting up ```config.txt```:
+For training and testing , after setting up ```config.txt```, write:
 ```
- $ cd Person-ReID
- $ mkdir log
- $ python3 main.py --cfg config/config.txt
+  python3 main.py --cfg config/config.txt
 ```
 
-For MGN+RPP or PCB+RPP models, there are 2 steps:
-
-1. set `model` to mgnrpp/pcbrpp, `module` to MGN, train 400 epochs.
-
-2. set `module` to RPP, `freeze` to 100, `load` to the checkpoint just saved, train 200 epochs.
 ---
 
 ## Test Results 
 of some models on Market-1501 dataset are listed as the following:
 
-|MODEL|dataset|mAP|rank-1|rank-3|rank-5|rank-10|
-|------|------|------|------|------|------|------|
-|AMG_front|Market1501|0.5887|0.7936|0.8884|0.9178|0.9471|
-|MGN with p2=3&p3=4|Market1501|0.8421|0.9365|0.9688|0.9771|0.9857|
-|ResNet50|Market1501|0.6647|0.8438|0.9138|0.9403|0.9611|
-|ResNet50-mid|Market1501|0.7027|0.8628|0.9267|0.9486|0.9682|
-|PCB|Market1501|0.8128|0.9305|0.9623|0.9724|0.9849|
-|PCB with rollback|Market1501|0.8232|0.9362|0.9659|0.9742|0.984|
+|MODEL|mAP|rank-1|rank-3|rank-5|rank-10|
+|------|------|------|------|------|------|
+|AMG_front|0.5887|0.7936|0.8884|0.9178|0.9471|
+|MGN with p2=3&p3=4|0.8421|0.9365|0.9688|0.9771|0.9857|
+|ResNet50|0.6647|0.8438|0.9138|0.9403|0.9611|
+|ResNet50-mid|0.7027|0.8628|0.9267|0.9486|0.9682|
+|PCB|0.8128|0.9305|0.9623|0.9724|0.9849|
+|PCB with rollback|0.8232|0.9362|0.9659|0.9742|0.984|
 
 PS. In this repository, MGN's base model is MobileNetV2, but not the ResNet50.
 

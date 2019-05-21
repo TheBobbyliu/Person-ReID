@@ -36,39 +36,33 @@ class Trainer():
         self.epoch = self.scheduler.last_epoch + 1
 
     # optim is for flexible convert between freeze training and non-freeze training
-    def train(self, optim):
+    def train(self):
         self.scheduler.step()
         self.loss.step()
         self.epoch = self.scheduler.last_epoch + 1
         lr = self.scheduler.get_lr()[0]
-        self.ckpt.write_log('\n[INFO] Epoch: {}\tLearning rate: {:.2e}'.format(self.epoch, lr))
-        self.lr = lr
+        if lr != self.lr:
+            self.ckpt.write_log('\n[INFO] Epoch: {}\tLearning rate: {:.2e}'.format(self.epoch, lr))
+            self.lr = lr
         self.loss.start_log()
         self.model.train()
 
         # running data
         for batch, (inputs, labels) in enumerate(self.train_loader):
-            t1 = time()
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
-            optim.zero_grad()
+            self.optimizer.zero_grad()
             outputs = self.model(inputs)
-            t2 = time()
-            # spent a lot of time
             loss = self.loss(outputs, labels)
             loss.backward()
-            t3 = time()
-            # spent a lot of time
-            optim.step()
-            t4 = time()
+            self.optimizer.step()
 
             self.ckpt.write_log('\r[INFO] [{}/{}]\t{}/{}\t{}'.format(
                 self.epoch, self.args.epochs,
                 batch + 1, len(self.train_loader),
                 self.loss.display_loss(batch)), 
             end='' if batch+1 != len(self.train_loader) else '\n')
-            t5 = time()
-            #print('\none: %.4f two: %.4f three: %.4f four: %.4f'%(t2-t1,t3-t2,t4-t3,t5-t4))
+
         self.loss.end_log(len(self.train_loader))
 
     def test(self):

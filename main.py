@@ -35,16 +35,12 @@ def main(args):
                 for par in model_.get_model().base_params:
                     par.requires_grad = False
 
-    optim_tmp = optimizer.make_optimizer(args, model_)
-    for i in range(args.freeze):
-        trainer_.train(optim_tmp)
-
     # start training
     for par in model_.parameters():
         par.requires_grad = True
 
     for i in range(trainer_.epoch, args.epochs):
-        trainer_.train(trainer_.optimizer)
+        trainer_.train()
         if args.test_every != 0 and (i+1) % args.test_every == 0:
             trainer_.test()
 

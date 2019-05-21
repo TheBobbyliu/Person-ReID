@@ -18,7 +18,7 @@ def make_optimizer(args, model):
         kwargs = {
             'betas': (args.beta1, args.beta2),
             'eps': args.epsilon,
-            'amsgrad': 1
+            'amsgrad': args.amsgrad
         }
     elif args.optimizer == 'NADAM':
         optimizer_function = NAdam

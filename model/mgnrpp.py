@@ -99,7 +99,6 @@ class MGN(nn.Module):
         # 24, 8
         p2 = self.p2(x)
         p3 = self.p3(x)
-        # TODO:: add RRP to the model
         
         middle = []
 
