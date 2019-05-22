@@ -34,6 +34,8 @@ def main(args):
             if hasattr(model_.get_model(), 'base_params'):
                 for par in model_.get_model().base_params:
                     par.requires_grad = False
+        for i in range(args.freeze):
+            trainer_.train()
 
     # start training
     for par in model_.parameters():
