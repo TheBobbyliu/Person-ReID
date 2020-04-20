@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from time import time
 from loss.triplet import TripletLoss, TripletSemihardLoss
-
+from loss import eet
 class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckpt):
         super(Loss, self).__init__()
@@ -26,8 +26,8 @@ class Loss(nn.modules.loss._Loss):
                 loss_function = nn.CrossEntropyLoss()
             elif loss_type == 'Triplet':
                 loss_function = TripletLoss(args.margin)
-            elif loss_type == 'Corr':
-                loss_function = CorrLoss()
+            elif loss_type == 'EET':
+                loss_function = eet.EETLoss(args.margin)
             self.loss.append({
                 'type': loss_type,
                 'weight': float(weight),
@@ -69,6 +69,12 @@ class Loss(nn.modules.loss._Loss):
                 #loss = l['function'](outputs[1], labels)
                 # For MGN/RPP
                 loss = [l['function'](output, labels) for output in outputs[-1]]
+                loss = sum(loss) / len(loss)
+                effective_loss = l['weight'] * loss
+                losses.append(effective_loss)
+                self.log[-1, i] += effective_loss.item()
+            elif l['type'] == 'EET':
+                loss = [l['function'](output, labels) for output in outputs[1:-1]]
                 loss = sum(loss) / len(loss)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
