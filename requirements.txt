@@ -1,4 +1,4 @@
-opencv_python==3.4.0.12
+opencv_python==3.4.7.28
 matplotlib==2.2.2
 torch==1.0.0
 setproctitle==1.1.10
