@@ -2,7 +2,7 @@ opencv_python==3.4.0.12
 matplotlib==2.2.2
 torch==1.0.0
 setproctitle==1.1.10
-numpy==1.15.4
+numpy==1.22.0
 torchvision==0.2.1
 scipy==1.1.0
 tqdm==4.23.4
